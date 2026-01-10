@@ -33,6 +33,12 @@ class CommunityPostFeedCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final imageUrl = feed.images.firstWhere(
+      (url) => url.isNotEmpty,
+      orElse: () => '',
+    );
+    final stopsPlanned = feed.itinerary.length;
+
     return GestureDetector(
       onTap: () {
         // quick visual confirmation and debug log that a tap occurred
@@ -47,297 +53,182 @@ class CommunityPostFeedCard extends StatelessWidget {
       },
       child: Container(
         margin: const EdgeInsets.symmetric(vertical: 10),
-        padding: const EdgeInsets.all(12),
         decoration: BoxDecoration(
           color: Colors.white,
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(16),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.04),
-              blurRadius: 8,
-              offset: const Offset(0, 3),
+              color: Colors.black.withOpacity(0.06),
+              blurRadius: 14,
+              offset: const Offset(0, 6),
             ),
           ],
         ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // Left vertical likes and heart
-                Column(
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              SizedBox(
+                height: 190,
+                width: double.infinity,
+                child: Stack(
+                  fit: StackFit.expand,
                   children: [
-                    const Icon(Icons.favorite_border, color: Color(0xFF9CA3AF)),
-                    const SizedBox(height: 6),
-                    Text(
-                      '${feed.likes}',
-                      style: const TextStyle(
-                        color: AppColors.subtext,
-                        fontSize: 12,
+                    if (imageUrl.isNotEmpty)
+                      Image.network(
+                        imageUrl,
+                        fit: BoxFit.cover,
+                      )
+                    else
+                      Container(
+                        color: AppColors.stroke,
+                        child: const Icon(
+                          Icons.image,
+                          size: 48,
+                          color: AppColors.subtext,
+                        ),
+                      ),
+                    Positioned(
+                      left: 12,
+                      top: 12,
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 10,
+                          vertical: 6,
+                        ),
+                        decoration: BoxDecoration(
+                          color: Colors.white.withOpacity(0.9),
+                          borderRadius: BorderRadius.circular(18),
+                        ),
+                        child: Text(
+                          feed.tag,
+                          style: const TextStyle(
+                            color: AppColors.text,
+                            fontWeight: FontWeight.w600,
+                            fontSize: 12,
+                          ),
+                        ),
                       ),
                     ),
                   ],
                 ),
-                const SizedBox(width: 12),
-
-                // Main card content
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        children: [
-                          CircleAvatar(
-                            radius: 18,
-                            backgroundImage: NetworkImage(feed.avatarUrl),
-                          ),
-                          const SizedBox(width: 10),
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    Text(
-                                      feed.author,
-                                      style: const TextStyle(
-                                        fontWeight: FontWeight.w700,
-                                        fontSize: 15,
-                                      ),
-                                    ),
-                                    Text(
-                                      feed.timeLocation,
-                                      style: const TextStyle(
-                                        color: AppColors.subtext,
-                                        fontSize: 12,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                                const SizedBox(height: 4),
-                                Text(
-                                  feed.title,
-                                  style: const TextStyle(
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.w800,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 8),
-                      // Tag chip
-                      Row(
-                        children: [
-                          Container(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 8,
-                              vertical: 4,
-                            ),
-                            decoration: BoxDecoration(
-                              color: const Color(0xFFE6F6EE),
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                            child: Text(
-                              feed.tag,
-                              style: const TextStyle(
-                                color: Color(0xFF10884F),
-                                fontSize: 12,
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 12),
-
-                      // Images row: left big, right tall
-                      SizedBox(
-                        height: 120,
-                        child: Row(
-                          children: [
-                            Expanded(
-                              flex: 2,
-                              child: ClipRRect(
-                                borderRadius: BorderRadius.circular(8),
-                                child:
-                                    (feed.images.isNotEmpty &&
-                                        feed
-                                            .images[0]
-                                            .isNotEmpty) // ✅ Check both
-                                    ? Image.network(
-                                        feed.images[0],
-                                        fit: BoxFit.cover,
-                                      )
-                                    : Container(
-                                        color: AppColors.stroke,
-                                        child: const Icon(Icons.image),
-                                      ),
-                              ),
-                            ),
-                            const SizedBox(width: 8),
-                            Expanded(
-                              flex: 1,
-                              child: ClipRRect(
-                                borderRadius: BorderRadius.circular(8),
-                                child:
-                                    (feed.images.length > 1 &&
-                                        feed
-                                            .images[1]
-                                            .isNotEmpty) // ✅ Check both
-                                    ? Image.network(
-                                        feed.images[1],
-                                        fit: BoxFit.cover,
-                                      )
-                                    : Container(
-                                        color: AppColors.stroke,
-                                        child: const Icon(Icons.image),
-                                      ),
-                              ),
-                            ),
-                          ],
+              ),
+              Padding(
+                padding: const EdgeInsets.fromLTRB(14, 12, 14, 14),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        CircleAvatar(
+                          radius: 18,
+                          backgroundImage: NetworkImage(feed.avatarUrl),
                         ),
-                      ),
-
-                      const SizedBox(height: 12),
-
-                      // Itinerary box
-                      Container(
-                        width: double.infinity,
-                        padding: const EdgeInsets.all(12),
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(8),
-                          border: Border.all(color: AppColors.stroke),
-                        ),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            RichText(
-                              text: TextSpan(
+                        const SizedBox(width: 10),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                feed.author,
+                                style: const TextStyle(
+                                  fontWeight: FontWeight.w700,
+                                  fontSize: 14,
+                                ),
+                              ),
+                              const SizedBox(height: 2),
+                              Text(
+                                feed.timeLocation,
                                 style: const TextStyle(
                                   color: AppColors.subtext,
                                   fontSize: 12,
                                 ),
-                                children: [
-                                  const TextSpan(text: 'DAY\u001F '),
-                                  TextSpan(
-                                    text: '1',
-                                    style: const TextStyle(
-                                      color: AppColors.text,
-                                      fontWeight: FontWeight.w700,
-                                    ),
-                                  ),
-                                ],
                               ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 10),
+                    Text(
+                      feed.title,
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                    const SizedBox(height: 10),
+                    Row(
+                      children: [
+                        const Icon(
+                          Icons.location_on_outlined,
+                          size: 16,
+                          color: AppColors.subtext,
+                        ),
+                        const SizedBox(width: 6),
+                        Text(
+                          '$stopsPlanned stops planned',
+                          style: const TextStyle(
+                            color: AppColors.subtext,
+                            fontSize: 12,
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 12),
+                    Row(
+                      children: [
+                        Row(
+                          children: [
+                            const Icon(
+                              Icons.favorite_border,
+                              size: 18,
+                              color: AppColors.subtext,
                             ),
-                            const SizedBox(height: 6),
-                            ...feed.itinerary.map(
-                              (s) => Row(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  const Text(
-                                    '• ',
-                                    style: TextStyle(fontSize: 14),
-                                  ),
-                                  Expanded(
-                                    child: Text(
-                                      s,
-                                      style: const TextStyle(
-                                        color: AppColors.text,
-                                      ),
-                                    ),
-                                  ),
-                                ],
+                            const SizedBox(width: 6),
+                            Text(
+                              '${feed.likes}',
+                              style: const TextStyle(
+                                color: AppColors.subtext,
+                                fontSize: 12,
                               ),
                             ),
                           ],
                         ),
-                      ),
-
-                      const SizedBox(height: 12),
-
-                      // Action buttons
-                      Wrap(
-                        spacing: 8,
-                        runSpacing: 8,
-                        children: [
-                          OutlinedButton.icon(
-                            onPressed: () {},
-                            icon: const Icon(
-                              Icons.map,
-                              color: Color(0xFF0F7A54),
+                        const SizedBox(width: 16),
+                        const Row(
+                          children: [
+                            Icon(
+                              Icons.chat_bubble_outline,
                               size: 18,
+                              color: AppColors.subtext,
                             ),
-                            label: const Text(
-                              'Map',
+                            SizedBox(width: 6),
+                            Text(
+                              '12',
                               style: TextStyle(
-                                color: Color(0xFF0F7A54),
+                                color: AppColors.subtext,
                                 fontSize: 12,
                               ),
                             ),
-                            style: OutlinedButton.styleFrom(
-                              side: const BorderSide(color: Color(0xFFE6F6EE)),
-                              backgroundColor: const Color(0xFFEFFAF3),
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 12,
-                                vertical: 8,
-                              ),
-                            ),
-                          ),
-                          OutlinedButton.icon(
-                            onPressed: () {},
-                            icon: const Icon(
-                              Icons.share,
-                              color: Color(0xFF0F7A54),
-                              size: 18,
-                            ),
-                            label: const Text(
-                              'Share',
-                              style: TextStyle(
-                                color: Color(0xFF0F7A54),
-                                fontSize: 12,
-                              ),
-                            ),
-                            style: OutlinedButton.styleFrom(
-                              side: const BorderSide(color: Color(0xFFE6F6EE)),
-                              backgroundColor: const Color(0xFFEFFAF3),
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 12,
-                                vertical: 8,
-                              ),
-                            ),
-                          ),
-                          ElevatedButton.icon(
-                            onPressed: () {},
-                            icon: const Icon(Icons.open_in_new, size: 18),
-                            label: const Text(
-                              'Visit',
-                              style: TextStyle(fontSize: 12),
-                            ),
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: const Color(0xFF007BFF),
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 12,
-                                vertical: 8,
-                              ),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(8),
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
+                          ],
+                        ),
+                        const Spacer(),
+                        const Icon(
+                          Icons.share_outlined,
+                          size: 18,
+                          color: AppColors.subtext,
+                        ),
+                      ],
+                    ),
+                  ],
                 ),
-              ],
-            ),
-          ],
+              ),
+            ],
+          ),
         ),
       ),
     );

@@ -185,7 +185,6 @@ class CommunityPostDetail extends StatelessWidget {
         ),
       ),
       body: SingleChildScrollView(
-        // Added scrolling for long itineraries
         padding: const EdgeInsets.all(16),
         child: Container(
           decoration: BoxDecoration(
@@ -194,185 +193,245 @@ class CommunityPostDetail extends StatelessWidget {
             boxShadow: [
               BoxShadow(
                 color: Colors.black.withOpacity(0.05),
-                blurRadius: 10,
-                offset: const Offset(0, 4),
+                blurRadius: 12,
+                offset: const Offset(0, 6),
               ),
             ],
           ),
-          child: Padding(
-            padding: const EdgeInsets.all(16),
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(16),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Header: Author info
-                Row(
-                  children: [
-                    CircleAvatar(
-                      radius: 22,
-                      backgroundColor: AppColors.stroke,
-                      child: ClipOval(
-                        child: SmartImage(
-                          url: feed.avatarUrl,
-                          heroTag: '${heroTag}_avatar',
-                          width: 44,
-                          height: 44,
-                        ),
-                      ),
-                    ),
-                    const SizedBox(width: 12),
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          feed.author,
-                          style: const TextStyle(
-                            fontWeight: FontWeight.w700,
-                            fontSize: 16,
-                          ),
-                        ),
-                        Text(
-                          feed.timeLocation,
-                          style: const TextStyle(
-                            color: AppColors.subtext,
-                            fontSize: 12,
-                          ),
-                        ),
-                      ],
-                    ),
-                    const Spacer(),
-                    const Icon(Icons.favorite_border, color: AppColors.subtext),
-                    const SizedBox(width: 4),
-                    Text(
-                      '${feed.likes}',
-                      style: const TextStyle(color: AppColors.subtext),
-                    ),
-                  ],
-                ),
-
-                const SizedBox(height: 16),
-                Text(
-                  feed.title,
-                  style: const TextStyle(
-                    fontSize: 22,
-                    fontWeight: FontWeight.w800,
-                  ),
-                ),
-                const SizedBox(height: 8),
-
-                // Tag
-                Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 10,
-                    vertical: 4,
-                  ),
-                  decoration: BoxDecoration(
-                    color: const Color(0xFFE6F6EE),
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                  child: Text(
-                    feed.tag,
-                    style: const TextStyle(
-                      color: Color(0xFF10884F),
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                ),
-
-                const SizedBox(height: 16),
-
-                if (feed.images.isNotEmpty)
-                  SizedBox(
-                    height: 220,
-                    child: ListView.builder(
-                      scrollDirection: Axis.horizontal,
-                      itemCount: feed.images.length,
-                      itemBuilder: (context, index) {
-                        return Padding(
-                          padding: const EdgeInsets.only(right: 12),
-                          child: SmartImage(
-                            url: feed.images[index],
-                            // Only the first image gets the Hero tag to match the feed card
-                            heroTag: index == 0 ? heroTag : '${heroTag}_$index',
-                            height: 200,
-                            width: MediaQuery.of(context).size.width * 0.75,
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                        );
-                      },
-                    ),
-                  ),
-
-                const SizedBox(height: 20),
-                const Text(
-                  'Itinerary',
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700),
-                ),
-                const SizedBox(height: 12),
-
-                // MODERN VERTICAL TIMELINE UI
-                ...feed.itinerary.asMap().entries.map((entry) {
-                  int idx = entry.key;
-                  String step = entry.value;
-                  bool isLast = idx == feed.itinerary.length - 1;
-
-                  return Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+                SizedBox(
+                  height: 210,
+                  child: Row(
                     children: [
-                      // Timeline line and dot
-                      Column(
-                        children: [
-                          Container(
-                            width: 12,
-                            height: 12,
-                            decoration: const BoxDecoration(
-                              color: Color(0xFF10884F),
-                              shape: BoxShape.circle,
-                            ),
-                          ),
-                          if (!isLast)
-                            Container(
-                              width: 2,
-                              height: 40,
-                              color: const Color(0xFFE6F6EE),
-                            ),
-                        ],
-                      ),
-                      const SizedBox(width: 16),
-                      // Itinerary text
                       Expanded(
-                        child: Padding(
-                          padding: const EdgeInsets.only(bottom: 20),
-                          child: Text(
-                            step,
-                            style: const TextStyle(fontSize: 15, height: 1.4),
-                          ),
+                        flex: 2,
+                        child: Stack(
+                          fit: StackFit.expand,
+                          children: [
+                            SmartImage(
+                              url: feed.images.isNotEmpty ? feed.images.first : '',
+                              heroTag: heroTag,
+                              borderRadius: BorderRadius.zero,
+                            ),
+                            Positioned(
+                              left: 12,
+                              bottom: 12,
+                              child: Container(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 10,
+                                  vertical: 6,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: Colors.white.withOpacity(0.9),
+                                  borderRadius: BorderRadius.circular(16),
+                                ),
+                                child: Text(
+                                  feed.tag,
+                                  style: const TextStyle(
+                                    color: AppColors.text,
+                                    fontWeight: FontWeight.w600,
+                                    fontSize: 12,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      Expanded(
+                        child: SmartImage(
+                          url: feed.images.length > 1 ? feed.images[1] : '',
+                          heroTag: '${heroTag}_2',
+                          borderRadius: BorderRadius.zero,
                         ),
                       ),
                     ],
-                  );
-                }),
-
-                const Divider(height: 32),
-
-                // Action buttons
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    _buildActionButton(Icons.map, 'Map'),
-                    _buildActionButton(Icons.share, 'Share'),
-                    ElevatedButton.icon(
-                      onPressed: () {},
-                      icon: const Icon(Icons.navigation),
-                      label: const Text('Start Trip'),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFF10884F),
-                        foregroundColor: Colors.white,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(8),
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(14, 12, 14, 16),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          CircleAvatar(
+                            radius: 18,
+                            backgroundColor: AppColors.stroke,
+                            child: ClipOval(
+                              child: SmartImage(
+                                url: feed.avatarUrl,
+                                heroTag: '${heroTag}_avatar',
+                                width: 36,
+                                height: 36,
+                              ),
+                            ),
+                          ),
+                          const SizedBox(width: 10),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  feed.author,
+                                  style: const TextStyle(
+                                    fontWeight: FontWeight.w700,
+                                    fontSize: 14,
+                                  ),
+                                ),
+                                const SizedBox(height: 2),
+                                Text(
+                                  feed.timeLocation,
+                                  style: const TextStyle(
+                                    color: AppColors.subtext,
+                                    fontSize: 12,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 12),
+                      Text(
+                        feed.title,
+                        style: const TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.w800,
                         ),
                       ),
-                    ),
-                  ],
+                      const SizedBox(height: 12),
+                      Container(
+                        width: double.infinity,
+                        padding: const EdgeInsets.all(14),
+                        decoration: BoxDecoration(
+                          color: AppColors.background,
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(color: AppColors.stroke),
+                        ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(
+                              children: const [
+                                Icon(
+                                  Icons.schedule,
+                                  size: 16,
+                                  color: AppColors.subtext,
+                                ),
+                                SizedBox(width: 6),
+                                Text(
+                                  'Day 1 Itinerary',
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.w700,
+                                    fontSize: 13,
+                                  ),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 10),
+                            ...feed.itinerary.take(4).toList().asMap().entries.map((entry) {
+                              final index = entry.key + 1;
+                              final step = entry.value;
+                              return Padding(
+                                padding: const EdgeInsets.only(bottom: 8),
+                                child: Row(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      '$index',
+                                      style: const TextStyle(
+                                        fontWeight: FontWeight.w700,
+                                        color: AppColors.subtext,
+                                      ),
+                                    ),
+                                    const SizedBox(width: 10),
+                                    Expanded(
+                                      child: Text(
+                                        step,
+                                        style: const TextStyle(
+                                          color: AppColors.text,
+                                          fontSize: 13,
+                                          height: 1.3,
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              );
+                            }),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(height: 12),
+                      Row(
+                        children: [
+                          Row(
+                            children: [
+                              const Icon(
+                                Icons.favorite_border,
+                                size: 18,
+                                color: AppColors.subtext,
+                              ),
+                              const SizedBox(width: 6),
+                              Text(
+                                '${feed.likes}',
+                                style: const TextStyle(
+                                  color: AppColors.subtext,
+                                  fontSize: 12,
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(width: 16),
+                          const Row(
+                            children: [
+                              Icon(
+                                Icons.chat_bubble_outline,
+                                size: 18,
+                                color: AppColors.subtext,
+                              ),
+                              SizedBox(width: 6),
+                              Text(
+                                '12',
+                                style: TextStyle(
+                                  color: AppColors.subtext,
+                                  fontSize: 12,
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(width: 16),
+                          const Icon(
+                            Icons.share_outlined,
+                            size: 18,
+                            color: AppColors.subtext,
+                          ),
+                          const Spacer(),
+                          ElevatedButton.icon(
+                            onPressed: () {},
+                            icon: const Icon(Icons.check_circle_outline, size: 18),
+                            label: const Text('Use This Plan'),
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: const Color(0xFF10884F),
+                              foregroundColor: Colors.white,
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 14,
+                                vertical: 10,
+                              ),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
                 ),
               ],
             ),
@@ -382,16 +441,5 @@ class CommunityPostDetail extends StatelessWidget {
     );
   }
 
-  Widget _buildActionButton(IconData icon, String label) {
-    return OutlinedButton.icon(
-      onPressed: () {},
-      icon: Icon(icon, color: const Color(0xFF0F7A54), size: 18),
-      label: Text(label, style: const TextStyle(color: Color(0xFF0F7A54))),
-      style: OutlinedButton.styleFrom(
-        backgroundColor: const Color(0xFFEFFAF3),
-        side: const BorderSide(color: Color(0xFFE6F6EE)),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-      ),
-    );
-  }
+  
 }
