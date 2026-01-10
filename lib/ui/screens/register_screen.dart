@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import '../components/app_colors.dart';
 import '../../services/api_client.dart';
 
@@ -85,7 +86,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
         }
         
         // Return to login or home
-        Navigator.pop(context);
+        context.pop();
       }
     } catch (e) {
       _showError(e.toString());
@@ -107,7 +108,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
             children: [
               // Back button
               GestureDetector(
-                onTap: () => Navigator.pop(context),
+                onTap: () => context.pop(),
                 child: Container(
                   width: 40, height: 40,
                   decoration: BoxDecoration(

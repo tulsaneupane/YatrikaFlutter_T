@@ -1,12 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
 import '../components/app_colors.dart';
-import 'itinerary_screen.dart';
+import '../../routes/app_routes.dart';
 
 class PlanWithAIScreen extends StatefulWidget {
-  const PlanWithAIScreen({super.key, this.onBack});
-
-  final VoidCallback? onBack;
+  const PlanWithAIScreen({super.key});
 
   @override
   State<PlanWithAIScreen> createState() => _PlanWithAIScreenState();
@@ -51,10 +50,10 @@ class _PlanWithAIScreenState extends State<PlanWithAIScreen> {
                 children: [
                   GestureDetector(
                     onTap: () {
-                      if (widget.onBack != null) {
-                        widget.onBack!();
+                      if (context.canPop()) {
+                        context.pop();
                       } else {
-                        Navigator.pop(context);
+                        context.go(AppRoutes.plan);
                       }
                     },
                     child: const Row(
@@ -373,11 +372,7 @@ class _PlanWithAIScreenState extends State<PlanWithAIScreen> {
                       child: ElevatedButton(
                         onPressed: () {
                           debugPrint('Generate button tapped');
-                          Navigator.of(context).push(
-                            MaterialPageRoute(
-                              builder: (_) => const ItineraryScreen(),
-                            ),
-                          );
+                          context.push(AppRoutes.planItinerary);
                         },
                         style: ElevatedButton.styleFrom(
                           backgroundColor: AppColors.primary,

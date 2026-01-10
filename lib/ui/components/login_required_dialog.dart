@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
 import '../components/app_colors.dart';
-import '../screens/login_screen.dart';
+import '../../routes/app_routes.dart';
 
 class LoginRequiredDialog extends StatelessWidget {
   const LoginRequiredDialog({
@@ -9,11 +10,13 @@ class LoginRequiredDialog extends StatelessWidget {
     required this.title,
     required this.message,
     this.onLoginSuccess,
+    required this.parentContext,
   });
 
   final String title;
   final String message;
   final VoidCallback? onLoginSuccess;
+  final BuildContext parentContext;
 
   static Future<bool?> show(
     BuildContext context, {
@@ -21,6 +24,7 @@ class LoginRequiredDialog extends StatelessWidget {
     required String message,
     VoidCallback? onLoginSuccess,
   }) {
+    final parentContext = context;
     return showModalBottomSheet<bool>(
       context: context,
       backgroundColor: Colors.transparent,
@@ -29,6 +33,7 @@ class LoginRequiredDialog extends StatelessWidget {
         title: title,
         message: message,
         onLoginSuccess: onLoginSuccess,
+        parentContext: parentContext,
       ),
     );
   }
@@ -104,20 +109,10 @@ class LoginRequiredDialog extends StatelessWidget {
             child: ElevatedButton(
               onPressed: () {
                 Navigator.pop(context);
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => LoginScreen(
-                      onLoginSuccess: () {
-                        Navigator.pop(context);
-                        if (onLoginSuccess != null) {
-                          onLoginSuccess!();
-                        }
-                      },
-                      onGuestContinue: () {
-                        Navigator.pop(context);
-                      },
-                    ),
+                parentContext.push(
+                  AppRoutes.login,
+                  extra: LoginScreenArgs(
+                    onLoginSuccess: onLoginSuccess,
                   ),
                 );
               },
@@ -147,20 +142,10 @@ class LoginRequiredDialog extends StatelessWidget {
             child: OutlinedButton(
               onPressed: () {
                 Navigator.pop(context);
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => LoginScreen(
-                      onLoginSuccess: () {
-                        Navigator.pop(context);
-                        if (onLoginSuccess != null) {
-                          onLoginSuccess!();
-                        }
-                      },
-                      onGuestContinue: () {
-                        Navigator.pop(context);
-                      },
-                    ),
+                parentContext.push(
+                  AppRoutes.login,
+                  extra: LoginScreenArgs(
+                    onLoginSuccess: onLoginSuccess,
                   ),
                 );
               },

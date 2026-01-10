@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
 import '../components/app_colors.dart';
-import 'register_screen.dart';
-
 import '../../services/api_client.dart';
+import '../../routes/app_routes.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key, this.onLoginSuccess, this.onGuestContinue});
@@ -50,14 +50,14 @@ Future<void> _handleLogin() async {
       }
 
       // 3. CRITICAL: Close the login screen to reveal the updated profile/home
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text("Login Successful!"),
-            backgroundColor: Colors.green,
-          ),
-        );
-        Navigator.pop(context); 
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text("Login Successful!"),
+              backgroundColor: Colors.green,
+            ),
+          );
+        context.pop();
       }
     }
   } catch (e) {
@@ -305,14 +305,15 @@ void _showError(String message) {
               const SizedBox(height: 16),
 
               // Continue as guest
-              SizedBox(
-                width: double.infinity,
-                child: OutlinedButton(
-                  onPressed: () {
-                    if (widget.onGuestContinue != null) {
-                      widget.onGuestContinue!();
-                    }
-                  },
+                SizedBox(
+                  width: double.infinity,
+                  child: OutlinedButton(
+                    onPressed: () {
+                      if (widget.onGuestContinue != null) {
+                        widget.onGuestContinue!();
+                      }
+                      context.pop();
+                    },
                   style: OutlinedButton.styleFrom(
                     side: const BorderSide(color: AppColors.stroke),
                     padding: const EdgeInsets.symmetric(vertical: 16),
@@ -392,12 +393,10 @@ void _showError(String message) {
                   ),
                   GestureDetector(
                     onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => RegisterScreen(
-                            onRegisterSuccess: widget.onLoginSuccess,
-                          ),
+                      context.push(
+                        AppRoutes.register,
+                        extra: RegisterScreenArgs(
+                          onRegisterSuccess: widget.onLoginSuccess,
                         ),
                       );
                     },

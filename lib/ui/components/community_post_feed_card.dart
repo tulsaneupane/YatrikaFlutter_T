@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
 import 'app_colors.dart';
-import '../screens/community_post_detail.dart';
+import '../../routes/app_routes.dart';
 
 class CommunityFeed {
   const CommunityFeed({
@@ -39,8 +40,9 @@ class CommunityPostFeedCard extends StatelessWidget {
           context,
         ).showSnackBar(const SnackBar(content: Text('Opening post...')));
         debugPrint('CommunityPostFeedCard tapped: ${feed.title}');
-        Navigator.of(context).push(
-          MaterialPageRoute(builder: (_) => CommunityPostDetail(feed: feed)),
+        context.push(
+          AppRoutes.communityPost,
+          extra: CommunityPostDetailArgs(feed: feed),
         );
       },
       child: Container(

@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import '../components/app_colors.dart';
 import '../../services/api_client.dart';
-import 'login_screen.dart';
+import '../../routes/app_routes.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({
@@ -328,7 +329,10 @@ class _GuestProfileView extends StatelessWidget {
                     width: double.infinity,
                     child: ElevatedButton(
                       onPressed: () {
-                        Navigator.push(context, MaterialPageRoute(builder: (context) => LoginScreen(onLoginSuccess: onLogin)));
+                        context.push(
+                          AppRoutes.login,
+                          extra: LoginScreenArgs(onLoginSuccess: onLogin),
+                        );
                       },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: AppColors.primary,

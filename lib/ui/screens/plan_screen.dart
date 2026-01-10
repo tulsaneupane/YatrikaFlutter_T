@@ -1,13 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
 import '../components/app_colors.dart';
-import 'plan_with_ai_screen.dart';
+import '../../routes/app_routes.dart';
 
 class PlanScreen extends StatefulWidget {
-  const PlanScreen({super.key, this.onBack, this.onNavigateToDiscover});
-
-  final VoidCallback? onBack;
-  final VoidCallback? onNavigateToDiscover;
+  const PlanScreen({super.key});
 
   @override
   State<PlanScreen> createState() => _PlanScreenState();
@@ -44,7 +42,7 @@ class _PlanScreenState extends State<PlanScreen> {
                 child: Row(
                   children: [
                     GestureDetector(
-                      onTap: widget.onBack,
+                      onTap: () => context.go(AppRoutes.home),
                       child: const Row(
                         children: [
                           Icon(Icons.chevron_left, color: AppColors.text, size: 24),
@@ -154,12 +152,7 @@ class _PlanScreenState extends State<PlanScreen> {
                       title: 'Plan with AI',
                       subtitle: 'Tell us your vibe and constraints; get a tailored itinerary.',
                       onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => const PlanWithAIScreen(),
-                          ),
-                        );
+                        context.push(AppRoutes.planAi);
                       },
                     ),
                     const SizedBox(height: 12),
@@ -170,9 +163,7 @@ class _PlanScreenState extends State<PlanScreen> {
                       title: 'View tour packages',
                       subtitle: 'Browse curated trips from trusted partners.',
                       onTap: () {
-                        if (widget.onNavigateToDiscover != null) {
-                          widget.onNavigateToDiscover!();
-                        }
+                        context.push(AppRoutes.packages);
                       },
                     ),
                   ],
@@ -260,12 +251,7 @@ class _PlanScreenState extends State<PlanScreen> {
                         Expanded(
                           child: OutlinedButton(
                             onPressed: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => const PlanWithAIScreen(),
-                                ),
-                              );
+                              context.push(AppRoutes.planAi);
                             },
                             style: OutlinedButton.styleFrom(
                               side: const BorderSide(color: AppColors.primary),

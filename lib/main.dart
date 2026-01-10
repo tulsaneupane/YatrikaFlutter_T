@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:curved_labeled_navigation_bar/curved_navigation_bar.dart';
 import 'package:curved_labeled_navigation_bar/curved_navigation_bar_item.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:go_router/go_router.dart';
 
 // Internal Imports
 import 'ui/components/app_colors.dart';
@@ -10,7 +11,15 @@ import 'ui/screens/community_screen.dart';
 import 'ui/screens/profile_screen.dart';
 import 'ui/screens/plan_screen.dart';
 import 'ui/screens/destination_list_screen.dart';
+import 'ui/screens/plan_with_ai_screen.dart';
+import 'ui/screens/itinerary_screen.dart';
+import 'ui/screens/tour_packages_screen.dart';
+import 'ui/screens/package_details_screen.dart';
+import 'ui/screens/login_screen.dart';
+import 'ui/screens/register_screen.dart';
+import 'ui/screens/community_post_detail.dart';
 import 'services/api_client.dart'; // Ensure this path is correct
+import 'routes/app_routes.dart';
 
 void main() async {
   // 1. Ensure Flutter bindings are initialized for async calls
@@ -22,12 +31,167 @@ void main() async {
   runApp(const MyApp());
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends StatefulWidget {
   const MyApp({super.key});
 
   @override
+  State<MyApp> createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
+  final ValueNotifier<bool> _isLoggedIn = ValueNotifier<bool>(false);
+  late final GoRouter _router;
+
+  @override
+  void initState() {
+    super.initState();
+    _checkInitialLoginStatus();
+    _router = _buildRouter();
+  }
+
+  void _checkInitialLoginStatus() {
+    // We check the headers; if 'Authorization' exists, ApiClient has a token.
+    final headers = ApiClient.headers();
+    if (headers.containsKey('Authorization')) {
+      _isLoggedIn.value = true;
+    }
+  }
+
+  void _handleLogin() {
+    _isLoggedIn.value = true;
+  }
+
+  void _handleLogout() {
+    _isLoggedIn.value = false;
+  }
+
+  GoRouter _buildRouter() {
+    return GoRouter(
+      initialLocation: AppRoutes.home,
+      refreshListenable: _isLoggedIn,
+      routes: [
+        StatefulShellRoute.indexedStack(
+          builder: (context, state, navigationShell) {
+            return MainScaffold(navigationShell: navigationShell);
+          },
+          branches: [
+            StatefulShellBranch(
+              routes: [
+                GoRoute(
+                  path: AppRoutes.home,
+                  builder: (context, state) => TourBookHome(
+                    onProfileTap: () => context.go(AppRoutes.profile),
+                  ),
+                ),
+              ],
+            ),
+            StatefulShellBranch(
+              routes: [
+                GoRoute(
+                  path: AppRoutes.discover,
+                  builder: (context, state) => const DestinationListScreen(),
+                ),
+              ],
+            ),
+            StatefulShellBranch(
+              routes: [
+                GoRoute(
+                  path: AppRoutes.plan,
+                  builder: (context, state) => const PlanScreen(),
+                ),
+              ],
+            ),
+            StatefulShellBranch(
+              routes: [
+                GoRoute(
+                  path: AppRoutes.posts,
+                  builder: (context, state) => const CommunityScreen(),
+                ),
+              ],
+            ),
+            StatefulShellBranch(
+              routes: [
+                GoRoute(
+                  path: AppRoutes.profile,
+                  builder: (context, state) => ProfileScreen(
+                    isLoggedIn: _isLoggedIn.value,
+                    onLogin: _handleLogin,
+                    onLogout: _handleLogout,
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+        GoRoute(
+          path: AppRoutes.destinations,
+          builder: (context, state) => const DestinationListScreen(),
+        ),
+        GoRoute(
+          path: AppRoutes.planAi,
+          builder: (context, state) => const PlanWithAIScreen(),
+        ),
+        GoRoute(
+          path: AppRoutes.planItinerary,
+          builder: (context, state) => const ItineraryScreen(),
+        ),
+        GoRoute(
+          path: AppRoutes.packages,
+          builder: (context, state) => TourPackagesScreen(
+            isLoggedIn: _isLoggedIn.value,
+          ),
+        ),
+        GoRoute(
+          path: AppRoutes.packageDetail,
+          builder: (context, state) {
+            final args = state.extra as PackageDetailsArgs;
+            return PackageDetailsScreen(
+              packageTitle: args.packageTitle,
+              packagePrice: args.packagePrice,
+              isLoggedIn: args.isLoggedIn,
+              itineraryId: args.itineraryId,
+            );
+          },
+        ),
+        GoRoute(
+          path: AppRoutes.login,
+          builder: (context, state) {
+            final args = state.extra as LoginScreenArgs?;
+            return LoginScreen(
+              onLoginSuccess: args?.onLoginSuccess,
+              onGuestContinue: args?.onGuestContinue,
+            );
+          },
+        ),
+        GoRoute(
+          path: AppRoutes.register,
+          builder: (context, state) {
+            final args = state.extra as RegisterScreenArgs?;
+            return RegisterScreen(
+              onRegisterSuccess: args?.onRegisterSuccess,
+            );
+          },
+        ),
+        GoRoute(
+          path: AppRoutes.communityPost,
+          builder: (context, state) {
+            final args = state.extra as CommunityPostDetailArgs;
+            return CommunityPostDetail(feed: args.feed);
+          },
+        ),
+      ],
+    );
+  }
+
+  @override
+  void dispose() {
+    _isLoggedIn.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    return MaterialApp.router(
       debugShowCheckedModeBanner: false,
       title: 'Yatrika',
       theme: ThemeData(
@@ -45,81 +209,26 @@ class MyApp extends StatelessWidget {
         fontFamily: GoogleFonts.ubuntu().fontFamily,
         useMaterial3: true,
       ),
-      home: const MainNavigator(),
+      routerConfig: _router,
     );
   }
 }
 
-class MainNavigator extends StatefulWidget {
-  const MainNavigator({super.key});
+class MainScaffold extends StatelessWidget {
+  const MainScaffold({super.key, required this.navigationShell});
 
-  @override
-  State<MainNavigator> createState() => _MainNavigatorState();
-}
-
-class _MainNavigatorState extends State<MainNavigator> {
-  int _currentIndex = 0;
-  bool _isLoggedIn = false;
-
-  @override
-  void initState() {
-    super.initState();
-    // 3. Check if a token exists to set the initial login state
-    _checkInitialLoginStatus();
-  }
-
-  void _checkInitialLoginStatus() {
-    // We check the headers; if 'Authorization' exists, ApiClient has a token.
-    final headers = ApiClient.headers();
-    if (headers.containsKey('Authorization')) {
-      setState(() {
-        _isLoggedIn = true;
-      });
-    }
-  }
-
-  void _handleLogin() {
-    setState(() {
-      _isLoggedIn = true;
-    });
-  }
-
-  void _handleLogout() {
-    setState(() {
-      _isLoggedIn = false;
-    });
-  }
-
-  List<Widget> get _screens => [
-        TourBookHome(onProfileTap: () => setState(() => _currentIndex = 4)),
-        const DestinationListScreen(),
-        PlanScreen(
-          onBack: () => setState(() => _currentIndex = 0),
-          onNavigateToDiscover: () => setState(() => _currentIndex = 1),
-        ),
-        const CommunityScreen(),
-        ProfileScreen(
-          isLoggedIn: _isLoggedIn,
-          onLogin: _handleLogin,
-          // If you add a logout button to ProfileScreen, pass this callback:
-          onLogout: _handleLogout, 
-        ),
-      ];
+  final StatefulNavigationShell navigationShell;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      // Use IndexedStack to preserve the state of each screen
-      body: IndexedStack(
-        index: _currentIndex,
-        children: _screens,
-      ),
+      body: navigationShell,
       bottomNavigationBar: CurvedNavigationBar(
         backgroundColor: Colors.transparent, // Smoother transition
         color: Colors.white,
         buttonBackgroundColor: AppColors.primary,
         height: 70,
-        index: _currentIndex,
+        index: navigationShell.currentIndex,
         animationDuration: const Duration(milliseconds: 300),
         items: const [
           CurvedNavigationBarItem(
@@ -149,9 +258,10 @@ class _MainNavigatorState extends State<MainNavigator> {
           ),
         ],
         onTap: (index) {
-          setState(() {
-            _currentIndex = index;
-          });
+          navigationShell.goBranch(
+            index,
+            initialLocation: index == navigationShell.currentIndex,
+          );
         },
       ),
     );

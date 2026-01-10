@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:tour_guide/services/api_client.dart';
 
 import '../components/app_colors.dart';
@@ -13,7 +14,7 @@ import '../../services/destination_service.dart';
 import '../../services/community_service.dart';
 import '../../models/destination.dart' as MD;
 import '../../models/community_post.dart' as CP;
-import 'destination_list_screen.dart';
+import '../../routes/app_routes.dart';
 
 class TourBookHome extends StatefulWidget {
   const TourBookHome({super.key, this.onProfileTap});
@@ -100,10 +101,7 @@ class _TourBookHomeState extends State<TourBookHome> {
       FeatureCardData(
         'Explore', 
         Icons.explore_outlined,
-        onTap: () => Navigator.push(
-          context,
-          MaterialPageRoute(builder: (context) => const DestinationListScreen()),
-        ),
+        onTap: () => context.push(AppRoutes.destinations),
       ),
       const FeatureCardData('Trip Planner', Icons.event_note_outlined),
       const FeatureCardData('Itineraries', Icons.route_outlined),
@@ -133,10 +131,7 @@ class _TourBookHomeState extends State<TourBookHome> {
                 SectionHeader(
                   title: 'Featured destinations',
                   actionText: 'See all',
-                  onActionTap: () => Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => const DestinationListScreen()),
-                  ),
+                  onActionTap: () => context.push(AppRoutes.destinations),
                 ),
                 const SizedBox(height: 12),
                 _loadingFeatured

@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
 import '../components/app_colors.dart';
-import 'package_details_screen.dart';
 import '../../services/itinerary_service.dart';
+import '../../routes/app_routes.dart';
 
 class TourPackage {
   const TourPackage({
@@ -121,7 +122,7 @@ class _TourPackagesScreenState extends State<TourPackagesScreen> {
                 children: [
                   if (widget.showBackButton) ...[
                     GestureDetector(
-                      onTap: () => Navigator.pop(context),
+                      onTap: () => context.pop(),
                       child: const Icon(
                         Icons.chevron_left,
                         color: AppColors.text,
@@ -537,15 +538,13 @@ class _PackageCard extends StatelessWidget {
                     ),
                     ElevatedButton(
                       onPressed: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => PackageDetailsScreen(
-                              packageTitle: package.title,
-                              packagePrice: package.price,
-                              isLoggedIn: isLoggedIn,
-                              itineraryId: package.id,
-                            ),
+                        context.push(
+                          AppRoutes.packageDetail,
+                          extra: PackageDetailsArgs(
+                            packageTitle: package.title,
+                            packagePrice: package.price,
+                            isLoggedIn: isLoggedIn,
+                            itineraryId: package.id,
                           ),
                         );
                       },
