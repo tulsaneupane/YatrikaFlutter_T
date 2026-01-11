@@ -57,7 +57,7 @@ class TopBar extends StatelessWidget {
               border: Border.all(color: AppColors.stroke),
             ),
             child: const Icon(
-              Icons.language,
+              Icons.notifications_none,
               size: 20,
               color: Color(0xFF606F81),
             ),
